@@ -4,7 +4,7 @@ WORKDIR /app
 
 ENV NODE_ENV=production \
     PORT=3000 \
-    PUBLIC_URL=https://zbi.babby
+    PUBLIC_URL=https://zbi.baby
 
 COPY package.json ./
 COPY docs ./docs

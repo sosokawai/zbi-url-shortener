@@ -14,7 +14,7 @@ services:
       context: .
       dockerfile: api/Dockerfile
     environment:
-      PUBLIC_URL: ${PUBLIC_URL:-https://zbi.babby}
+      PUBLIC_URL: ${PUBLIC_URL:-https://zbi.baby}
       MAX_URL_LENGTH: ${MAX_URL_LENGTH:-2048}
     expose:
       - "3000"

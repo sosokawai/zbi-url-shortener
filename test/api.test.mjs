@@ -31,14 +31,14 @@ await test("docs page is served at /api", async () => {
   const r = await get("/api");
   assert.equal(r.status, 200);
   assert.match(r.headers.get("content-type"), /text\/html/);
-  assert.match(await r.text(), /zbi\.babby api/);
+  assert.match(await r.text(), /zbi\.baby api/);
 });
 
 for (const mode of ["hash", "emoji", "qr"]) {
   await test(`shorten roundtrips in ${mode} mode`, async () => {
     const target = "https://www.amazon.com/dp/B0CX23V2ZK/ref=sr_1_1?keywords=widget&qid=1720000000";
     const { short: link } = await short(target, `&mode=${mode}`);
-    assert.ok(link.startsWith("https://zbi.babby"), `link is on the right host: ${link}`);
+    assert.ok(link.startsWith("https://zbi.baby"), `link is on the right host: ${link}`);
     const back = await get(`/api/v1/expand?link=${encodeURIComponent(link)}&format=text`);
     assert.equal((await back.text()).trim(), target);
   });
@@ -49,7 +49,7 @@ await test("format=text returns one bare link", async () => {
   assert.match(r.headers.get("content-type"), /text\/plain/);
   const body = (await r.text()).trim();
   assert.equal(body.split("\n").length, 1);
-  assert.ok(body.startsWith("https://zbi.babby#"));
+  assert.ok(body.startsWith("https://zbi.baby#"));
 });
 
 await test("Accept: text/plain returns text", async () => {
@@ -57,7 +57,7 @@ await test("Accept: text/plain returns text", async () => {
     headers: { accept: "text/plain" }
   });
   assert.match(r.headers.get("content-type"), /text\/plain/);
-  assert.ok((await r.text()).trim().startsWith("https://zbi.babby#"));
+  assert.ok((await r.text()).trim().startsWith("https://zbi.baby#"));
 });
 
 await test("cors is open for browser clients", async () => {
@@ -75,7 +75,7 @@ await test("a discord bot user agent is served like anyone else", async () => {
   });
   assert.equal(r.status, 200);
   const body = await r.json();
-  assert.ok(body.short.startsWith("https://zbi.babby#"));
+  assert.ok(body.short.startsWith("https://zbi.baby#"));
   const back = await get(`/api/v1/expand?link=${encodeURIComponent(body.short)}&format=text`, {
     headers: { "user-agent": DISCORD_UA }
   });
@@ -114,7 +114,7 @@ await test("post as a form", async () => {
 
 await test("qr links live in the path so a preview can see them", async () => {
   const { short: link } = await short("https://example.com/qr/in/a/path", "&mode=qr");
-  assert.ok(link.startsWith("https://zbi.babby/"), link);
+  assert.ok(link.startsWith("https://zbi.baby/"), link);
   assert.ok(!link.includes("#"));
   const back = await get(`/api/v1/expand?link=${encodeURIComponent(link)}&format=text`);
   assert.equal((await back.text()).trim(), "https://example.com/qr/in/a/path");

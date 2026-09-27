@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>zbi.babby api</title>
+  <title>zbi.baby api</title>
   <style>
     :root {
       color-scheme: light dark;
@@ -108,7 +108,7 @@
 
   <a class="back" href="/">&larr; shortener</a>
 
-  <h1>zbi.babby api</h1>
+  <h1>zbi.baby api</h1>
   <p class="subtitle">For bots, scripts and anything that speaks http.</p>
 
   <p>
@@ -167,31 +167,31 @@
 
   <h2>Shorten</h2>
   <pre># json in, json out, which is what curl gets
-curl -G "https://zbi.babby/api/v1/shorten" \
+curl -G "https://zbi.baby/api/v1/shorten" \
   --data-urlencode "url=https://www.amazon.com/dp/B0CX23V2ZK/ref=sr_1_1?keywords=widget&amp;qid=1720000000"
 
 # the --data-urlencode is what keeps the ? and &amp; in the link from being read
 # as parameters of the api call itself
 
 # one line of text instead of json, for bots
-curl -G "https://zbi.babby/api/v1/shorten" --data-urlencode "url=https://example.com/x" -d "format=text"
-curl -H "Accept: text/plain" "https://zbi.babby/api/v1/shorten?url=https://example.com/x"
+curl -G "https://zbi.baby/api/v1/shorten" --data-urlencode "url=https://example.com/x" -d "format=text"
+curl -H "Accept: text/plain" "https://zbi.baby/api/v1/shorten?url=https://example.com/x"
 
 # post it instead, as json
-curl -X POST https://zbi.babby/api/v1/shorten \
+curl -X POST https://zbi.baby/api/v1/shorten \
   -H "Content-Type: application/json" \
   -d '{"url":"https://example.com/some/long/path","mode":"hash"}'
 
 # or as a form, the way a html form would send it
-curl -X POST https://zbi.babby/api/v1/shorten -d "url=https://example.com/x"
+curl -X POST https://zbi.baby/api/v1/shorten -d "url=https://example.com/x"
 
 # qr links keep the payload in the path
-curl -G "https://zbi.babby/api/v1/shorten" --data-urlencode "url=https://example.com/x" -d "mode=qr" -d "format=text"</pre>
+curl -G "https://zbi.baby/api/v1/shorten" --data-urlencode "url=https://example.com/x" -d "mode=qr" -d "format=text"</pre>
 
   <p>Response, for the amazon link above:</p>
   <pre>{
   "input": "https://www.amazon.com/dp/B0CX23V2ZK/ref=sr_1_1?keywords=widget&amp;qid=1720000000",
-  "short": "https://zbi.babby#j,7*+lgC#nlHXCWK7#Bs!+ZxT*GtbviRyo_Zl@C*/?f@IA$0[wM&apos;Tj&amp;!",
+  "short": "https://zbi.baby#j,7*+lgC#nlHXCWK7#Bs!+ZxT*GtbviRyo_Zl@C*/?f@IA$0[wM&apos;Tj&amp;!",
   "payload": "j,7*+lgC#nlHXCWK7#Bs!+ZxT*GtbviRyo_Zl@C*/?f@IA$0[wM&apos;Tj&amp;!",
   "mode": "hash",
   "input_length": 78,
@@ -202,14 +202,14 @@ curl -G "https://zbi.babby/api/v1/shorten" --data-urlencode "url=https://example
 
   <h2>Expand</h2>
   <pre># percent-encode the # so it is not read as a fragment of the api call
-curl "https://zbi.babby/api/v1/expand?link=https%3A%2F%2Fzbi.babby%23j%2C7*%2BlgC%23nlHXCWK7%23Bs!%2BZxT*GtbviRyo_Zl%40C*%2F%3Ff%40IA$0%5BwM%27Tj%26%21"
+curl "https://zbi.baby/api/v1/expand?link=https%3A%2F%2Fzbi.baby%23j%2C7*%2BlgC%23nlHXCWK7%23Bs!%2BZxT*GtbviRyo_Zl%40C*%2F%3Ff%40IA$0%5BwM%27Tj%26%21"
 
 # or let curl do it
-curl -G "https://zbi.babby/api/v1/expand" \
-  --data-urlencode "link=https://zbi.babby#j,7*+lgC#nlHXCWK7#Bs!+ZxT*GtbviRyo_Zl@C*/?f@IA$0[wM&apos;Tj&amp;!"
+curl -G "https://zbi.baby/api/v1/expand" \
+  --data-urlencode "link=https://zbi.baby#j,7*+lgC#nlHXCWK7#Bs!+ZxT*GtbviRyo_Zl@C*/?f@IA$0[wM&apos;Tj&amp;!"
 
 # a bare payload works too
-curl -G "https://zbi.babby/api/v1/expand" --data-urlencode "payload=OQ/ap#"</pre>
+curl -G "https://zbi.baby/api/v1/expand" --data-urlencode "payload=OQ/ap#"</pre>
 
   <p>Response:</p>
   <pre>{ "url": "https://www.amazon.com/dp/B0CX23V2ZK/ref=sr_1_1?keywords=widget&amp;qid=1720000000" }</pre>
@@ -224,7 +224,7 @@ curl -G "https://zbi.babby/api/v1/expand" --data-urlencode "payload=OQ/ap#"</pre
       A <code>#fragment</code> link is only decodable in a browser, because a
       fragment never reaches a server. Anything that fetches a link itself — a
       link preview crawler, a validator, a client that trims the tail off — sees
-      plain <code>zbi.babby</code> and nothing more. When you need a link that
+      plain <code>zbi.baby</code> and nothing more. When you need a link that
       stands on its own, ask for <code>mode=qr</code>: the payload rides in the
       path, so the link is decodable by anything.
     </li>
@@ -240,7 +240,7 @@ from discord.ext import commands
 @commands.command()
 async def shorten(ctx, url: str):
     response = requests.get(
-        "https://zbi.babby/api/v1/shorten",
+        "https://zbi.baby/api/v1/shorten",
         params={"url": url, "mode": "qr"},
         headers={"Accept": "text/plain"},
         timeout=5,
@@ -249,7 +249,7 @@ async def shorten(ctx, url: str):
     await ctx.send(response.text.strip())</pre>
   <pre>// discord.js
 const query = new URLSearchParams({ url, mode: "qr", format: "text" });
-const response = await fetch(`https://zbi.babby/api/v1/shorten?${query}`);
+const response = await fetch(`https://zbi.baby/api/v1/shorten?${query}`);
 if (response.ok) {
   await interaction.reply((await response.text()).trim());
 }</pre>
@@ -290,7 +290,7 @@ if (response.ok) {
   <h2>Links</h2>
   <p class="note">
     <a href="https://github.com/sosokawai/zbi-url-shortener">Source code</a> &middot;
-    <a href="/">zbi.babby</a> &middot; fork of <a href="https://github.com/p2r3/ha.mr">ha.mr</a>
+    <a href="/">zbi.baby</a> &middot; fork of <a href="https://github.com/p2r3/ha.mr">ha.mr</a>
   </p>
 
   <script type="module">

@@ -9,13 +9,13 @@ rules = [
 ]
 
 [vars]
-PUBLIC_URL = "https://zbi.babby"
+PUBLIC_URL = "https://zbi.baby"
 MAX_URL_LENGTH = "2048"
 
 # Serves /api on the same domain as the Pages site, so the site can link to
 # "/api" and bots only ever need one hostname. Change the zone_name to the zone
 # that actually holds the domain.
 routes = [
-  { pattern = "zbi.babby/api", zone_name = "babby" },
-  { pattern = "zbi.babby/api/*", zone_name = "babby" }
+  { pattern = "zbi.baby/api", zone_name = "baby" },
+  { pattern = "zbi.baby/api/*", zone_name = "baby" }
 ]

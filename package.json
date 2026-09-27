@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Stateless URL compressor hosted on zbi.babby, with a public JSON API for bots",
+  "description": "Stateless URL compressor hosted on zbi.baby, with a public JSON API for bots",
   "scripts": {
     "start": "node api/server.js",
     "test": "node test/api.test.mjs",

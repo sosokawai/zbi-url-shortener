@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>zbi.babby - link compressor</title>
-  <link rel="icon" type="image/png" href="/zbi.babby.png">
+  <title>zbi.baby - link compressor</title>
+  <link rel="icon" type="image/png" href="/zbi.baby.png">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Hammersmith+One&display=swap');
 
@@ -19,6 +19,7 @@
     }
     body {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       font-size: 120%;
@@ -88,6 +89,10 @@
     .title {
       font-size: 2.5em;
     }
+    .logo {
+      display: block;
+      margin: 0 auto 14px;
+    }
     .subtitle {
       font-size: 0.6em;
       margin-top: -10px;
@@ -150,8 +155,7 @@
       color: #111111;
     }
     header {
-      position: absolute;
-      top: 20px;
+      margin-bottom: 18px;
       pointer-events: none;
       opacity: 0;
       transition: opacity 1s;
@@ -209,7 +213,9 @@
 
   <div id="content">
 
-    <h1 class="title">zbi.babby</h1>
+    <img class="logo" src="/logo.png" width="88" height="130" alt="">
+
+    <h1 class="title">zbi.baby</h1>
     <p class="subtitle">(short links, no database)</p>
 
     <input type="text" id="input-link" placeholder="https://some-long.link/" autofocus>

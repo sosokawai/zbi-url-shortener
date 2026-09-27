@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { handleRequest } from "./core.js";
 
 const PORT = Number(process.env.PORT || 3000);
-const PUBLIC_URL = (process.env.PUBLIC_URL || "https://zbi.babby").replace(/\/+$/, "");
+const PUBLIC_URL = (process.env.PUBLIC_URL || "https://zbi.baby").replace(/\/+$/, "");
 const MAX_URL_LENGTH = Number(process.env.MAX_URL_LENGTH || 2048);
 const MAX_BODY_LENGTH = 8192;
 const DOCS_PATH = fileURLToPath(new URL("./docs.html", import.meta.url));
@@ -50,5 +50,5 @@ createServer(async (req, res) => {
   res.writeHead(result.status, result.headers);
   res.end(req.method === "HEAD" || result.body === null ? undefined : result.body);
 }).listen(PORT, () => {
-  console.log(`zbi.babby api listening on :${PORT}, public url ${PUBLIC_URL}`);
+  console.log(`zbi.baby api listening on :${PORT}, public url ${PUBLIC_URL}`);
 });

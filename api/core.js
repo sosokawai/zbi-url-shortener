@@ -72,7 +72,7 @@ export function shorten (rawUrl, mode, publicUrl, maxUrlLength) {
 
 export function expand (rawLink, publicUrl) {
   if (typeof rawLink !== "string" || !rawLink.trim()) {
-    throw new ApiError(400, "missing_link", "No short link given. Pass ?link=https://zbi.babby#...");
+    throw new ApiError(400, "missing_link", "No short link given. Pass ?link=https://zbi.baby#...");
   }
   let payload = rawLink.trim();
   const host = publicUrl.toLowerCase();
@@ -146,13 +146,13 @@ export function handleRequest ({ method, url, body, accept, publicUrl, maxUrlLen
   try {
     if (url.pathname === "/api" || url.pathname === "/api/" || url.pathname === "/api/index.html") {
       if (wantsText(url, accept)) {
-        return json({ service: "zbi.babby", public_url: publicUrl, endpoints: ENDPOINTS });
+        return json({ service: "zbi.baby", public_url: publicUrl, endpoints: ENDPOINTS });
       }
       return reply(docsHtml, "text/html; charset=utf-8");
     }
 
     if (url.pathname === "/api/v1" || url.pathname === "/api/v1/") {
-      return json({ service: "zbi.babby", public_url: publicUrl, endpoints: ENDPOINTS });
+      return json({ service: "zbi.baby", public_url: publicUrl, endpoints: ENDPOINTS });
     }
 
     if (url.pathname === "/api/v1/health") {

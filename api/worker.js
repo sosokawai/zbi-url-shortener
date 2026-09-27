@@ -18,7 +18,7 @@ export default {
       url,
       body,
       accept: request.headers.get("accept") || "",
-      publicUrl: (env.PUBLIC_URL || "https://zbi.babby").replace(/\/+$/, ""),
+      publicUrl: (env.PUBLIC_URL || "https://zbi.baby").replace(/\/+$/, ""),
       maxUrlLength: Number(env.MAX_URL_LENGTH || 2048),
       docsHtml
     });

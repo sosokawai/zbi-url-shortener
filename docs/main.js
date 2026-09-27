@@ -7,10 +7,10 @@ import {
 
 let qrGenerate, qrMode, qrCorrection;
 
-const intendedDomains = ["zbi.babby", "www.zbi.babby"];
+const intendedDomains = ["zbi.baby", "www.zbi.baby"];
 let domain = window.location.hostname;
 if (!intendedDomains.includes(domain)) {
-  console.log(`This page is intended to be used on the zbi.babby domain. You are currently on ${domain}.`);
+  console.log(`This page is intended to be used on the zbi.baby domain. You are currently on ${domain}.`);
 }
 const webPort = window.location.port;
 if (webPort && webPort !== "80" && webPort !== "443") {
@@ -187,7 +187,7 @@ function updateOutput () {
 }
 
 const localLogElement = document.querySelector("#local-log");
-const localLogKey = "zbi.babby.log";
+const localLogKey = "zbi.baby.log";
 
 function renderLocalLog (entries) {
   if (!localLogElement) return;

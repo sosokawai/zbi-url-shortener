@@ -1,10 +1,10 @@
-# zbi.babby
+# zbi.baby
 
 A URL shortener that has no database. The whole shortened link is squeezed into
 the address itself, so nothing is ever stored, nothing can leak, and there is no
 key to sign up for.
 
-Live at **zbi.babby**, with a JSON API at **zbi.babby/api** for bots and scripts.
+Live at **zbi.baby**, with a JSON API at **zbi.baby/api** for bots and scripts.
 
 This is a fork of [ha.mr](https://github.com/p2r3/ha.mr) by p2r3, which did all
 the hard work. See [what changed here](#what-changed-here) and
@@ -22,7 +22,7 @@ npm run deploy:site  # docs/ -> Cloudflare Pages
 npm run deploy:api   # api/worker.js -> Cloudflare Workers
 ```
 
-- **Pages** serves `docs/`. Attach `zbi.babby` as a custom domain in the project
+- **Pages** serves `docs/`. Attach `zbi.baby` as a custom domain in the project
   settings. `docs/CNAME` holds the same name for the git-based flow.
 - **Workers** serves `/api` on the same hostname, so the site can link to `/api`
   and a bot only needs one domain. The route, the zone and the variables
@@ -31,7 +31,7 @@ npm run deploy:api   # api/worker.js -> Cloudflare Workers
   change before deploying it.
 
 If Pages takes `/api` back on your zone, give the Worker its own subdomain:
-change `pattern` to `api.zbi.babby/*`, attach that as a custom domain, and point
+change `pattern` to `api.zbi.baby/*`, attach that as a custom domain, and point
 the `API` link in `docs/404.html` at it.
 
 ## Running it locally
@@ -44,13 +44,13 @@ Two containers: `web` (nginx, serves `docs/`) and `api` (node, no dependencies,
 serves `/api/*`). Without docker, just the api:
 
 ```sh
-npm start                       # or: PUBLIC_URL=https://zbi.babby node api/server.js
+npm start                       # or: PUBLIC_URL=https://zbi.baby node api/server.js
 ```
 
 | variable | default | what it does |
 | --- | --- | --- |
 | `PORT` | `3000` | port the node server listens on |
-| `PUBLIC_URL` | `https://zbi.babby` | host used in the links that get returned |
+| `PUBLIC_URL` | `https://zbi.baby` | host used in the links that get returned |
 | `MAX_URL_LENGTH` | `2048` | reject longer links with a `414` |
 
 ## API
@@ -61,27 +61,27 @@ serves the same documentation in a browser, with a box to try it in.
 
 ```sh
 # compress, json out
-curl -G "https://zbi.babby/api/v1/shorten" \
+curl -G "https://zbi.baby/api/v1/shorten" \
   --data-urlencode "url=https://www.amazon.com/dp/B0CX23V2ZK/ref=sr_1_1?keywords=widget&qid=1720000000"
 
 # --data-urlencode is what keeps the ? and & in the link from being read as
 # parameters of the api call itself
 
 # one line of text, for bots
-curl -G "https://zbi.babby/api/v1/shorten" --data-urlencode "url=https://example.com/x" -d "format=text"
-curl -H "Accept: text/plain" "https://zbi.babby/api/v1/shorten?url=https://example.com/x"
+curl -G "https://zbi.baby/api/v1/shorten" --data-urlencode "url=https://example.com/x" -d "format=text"
+curl -H "Accept: text/plain" "https://zbi.baby/api/v1/shorten?url=https://example.com/x"
 
 # post instead, json or form encoded
-curl -X POST https://zbi.babby/api/v1/shorten \
+curl -X POST https://zbi.baby/api/v1/shorten \
   -H "Content-Type: application/json" -d '{"url":"https://example.com/x"}'
-curl -X POST https://zbi.babby/api/v1/shorten -d "url=https://example.com/x"
+curl -X POST https://zbi.baby/api/v1/shorten -d "url=https://example.com/x"
 
 # unpack, with the # percent encoded
-curl -G "https://zbi.babby/api/v1/expand" \
-  --data-urlencode "link=https://zbi.babby#OQ/ap#"
+curl -G "https://zbi.baby/api/v1/expand" \
+  --data-urlencode "link=https://zbi.baby#OQ/ap#"
 
 # health
-curl https://zbi.babby/api/v1/health
+curl https://zbi.baby/api/v1/health
 ```
 
 `mode` picks the flavour: `hash` (default, payload in the fragment), `emoji`
@@ -96,7 +96,7 @@ One GET, no key, nothing to sign up for:
 ```py
 # discord.py
 response = requests.get(
-    "https://zbi.babby/api/v1/shorten",
+    "https://zbi.baby/api/v1/shorten",
     params={"url": url, "mode": "qr"},
     headers={"Accept": "text/plain"},
     timeout=5,
@@ -107,13 +107,13 @@ await ctx.send(response.text.strip())
 
 Ask for `mode=qr` in a chat bot. A `#fragment` link never reaches a server, so
 Discord's preview crawler (and anything else that fetches the link) only sees
-`zbi.babby`; a path link is decodable by anything.
+`zbi.baby`; a path link is decodable by anything.
 
 ### Testing it
 
 ```sh
 npm test                                  # against the local compose stack
-BASE_URL=https://zbi.babby npm test        # against what is actually deployed
+BASE_URL=https://zbi.baby npm test        # against what is actually deployed
 ```
 
 16 checks covering all three modes, JSON and form posts, CORS, every error
@@ -124,7 +124,7 @@ code, and requests made with a Discord bot user agent, no user agent, and a
 
 ```sh
 node standalone.js https://example.com/some/long/path    # encode
-node standalone.js "https://zbi.babby#OQ/ap#"              # decode, quotes matter
+node standalone.js "https://zbi.baby#OQ/ap#"              # decode, quotes matter
 node standalone.js https://example.com/some/long/path qr  # qr alphabet, no fragment
 ```
 
@@ -132,7 +132,7 @@ node standalone.js https://example.com/some/long/path qr  # qr alphabet, no frag
 
 Everything upstream does still works, unmodified. The fork adds:
 
-- the **zbi.babby** branding, and links that keep the protocol the page was
+- the **zbi.baby** branding, and links that keep the protocol the page was
   served with, so an instance behind TLS hands out `https://` links instead of
   downgrading them
 - a **public API** on `/api`, as a Cloudflare Worker, plus a node server that
@@ -152,7 +152,7 @@ Everything upstream does still works, unmodified. The fork adds:
 - `test/api.test.mjs` — the api test suite, no dependencies
 - `wrangler.toml` — Worker name, routes and variables
 
-To move to a different domain, replace `zbi.babby` in `docs/main.js`,
+To move to a different domain, replace `zbi.baby` in `docs/main.js`,
 `docs/404.html`, `docs/CNAME`, `standalone.js`, `nginx.conf` and `wrangler.toml`.
 
 ## How it works
