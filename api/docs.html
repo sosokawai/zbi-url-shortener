@@ -154,7 +154,7 @@
     <tr>
       <td><code>GET</code></td>
       <td><code>/api/v1/expand</code></td>
-      <td>Unpack a short link. Parameter: <code>link</code> (a full short link, or a bare payload).</td>
+      <td>Unpack a short link. Parameters: <code>link</code> (a full short link, or a bare payload), <code>mode</code> to disambiguate a bare payload.</td>
     </tr>
     <tr>
       <td><code>GET</code></td>
@@ -213,6 +213,15 @@ curl -G "https://zbi.baby/api/v1/expand" \
 
 # a bare payload works too
 curl -G "https://zbi.baby/api/v1/expand" --data-urlencode "payload=OQ/ap#"</pre>
+
+  <p class="note">
+    A bare <code>qr</code> payload is the one case that needs a hint, because
+    those symbols are indistinguishable from a text payload, and decoding one as
+    the other can still come out looking like a link. Send <code>mode=qr</code>,
+    or put a <code>/</code> in front of the payload, or just send the whole short
+    link. Guessing would mean handing back the wrong link with a 200, so the api
+    answers <code>400 ambiguous_payload</code> instead.
+  </p>
 
   <p>Response:</p>
   <pre>{ "url": "https://www.amazon.com/dp/B0CX23V2ZK/ref=sr_1_1?keywords=widget&amp;qid=1720000000" }</pre>
@@ -273,7 +282,7 @@ if (response.ok) {
   }
 }</pre>
   <ul>
-    <li><code>400</code> <code>missing_url</code>, <code>invalid_url</code>, <code>unsupported_protocol</code>, <code>credentials_not_supported</code>, <code>unknown_mode</code>, <code>missing_link</code>, <code>undecodable</code>, <code>invalid_json</code></li>
+    <li><code>400</code> <code>missing_url</code>, <code>invalid_url</code>, <code>unsupported_protocol</code>, <code>credentials_not_supported</code>, <code>unknown_mode</code>, <code>missing_link</code>, <code>undecodable</code>, <code>ambiguous_payload</code>, <code>invalid_json</code></li>
     <li><code>404</code> <code>not_found</code></li>
     <li><code>405</code> <code>method_not_allowed</code></li>
     <li><code>413</code> <code>body_too_long</code></li>

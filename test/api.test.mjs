@@ -120,6 +120,34 @@ await test("qr links live in the path so a preview can see them", async () => {
   assert.equal((await back.text()).trim(), "https://example.com/qr/in/a/path");
 });
 
+await test("a bare qr payload needs mode=qr or a leading slash", async () => {
+  const { payload } = await short("https://example.com/qr/in/a/path", "&mode=qr");
+  const hinted = await get(`/api/v1/expand?payload=${encodeURIComponent(payload)}&mode=qr&format=text`);
+  assert.equal((await hinted.text()).trim(), "https://example.com/qr/in/a/path");
+  const slashed = await get(`/api/v1/expand?link=${encodeURIComponent(`/${payload}`)}&format=text`);
+  assert.equal((await slashed.text()).trim(), "https://example.com/qr/in/a/path");
+  const blind = await get(`/api/v1/expand?payload=${encodeURIComponent(payload)}`);
+  assert.equal(blind.status, 400);
+  assert.equal((await blind.json()).error.code, "ambiguous_payload");
+});
+
+await test("a hash payload that happens to be qr only symbols is refused, not guessed", async () => {
+  const qr = await short("https://example.com/qr/in/a/path", "&mode=qr");
+  const r = await get(`/api/v1/expand?payload=${encodeURIComponent(qr.payload)}`);
+  assert.equal(r.status, 400);
+  const body = await r.json();
+  assert.equal(body.error.code, "ambiguous_payload");
+  assert.match(body.error.message, /mode=qr/);
+});
+
+await test("hash and emoji payloads still expand without a hint", async () => {
+  for (const mode of ["hash", "emoji"]) {
+    const { short: link } = await short("https://example.com/plain/round/trip", `&mode=${mode}`);
+    const back = await get(`/api/v1/expand?link=${encodeURIComponent(link)}&format=text`);
+    assert.equal((await back.text()).trim(), "https://example.com/plain/round/trip", `mode ${mode}`);
+  }
+});
+
 await test("error codes come back with the right status", async () => {
   const cases = [
     ["/api/v1/shorten", 400, "missing_url"],

@@ -70,7 +70,7 @@ export function shorten (rawUrl, mode, publicUrl, maxUrlLength) {
   };
 }
 
-export function expand (rawLink, publicUrl) {
+export function expand (rawLink, publicUrl, mode) {
   if (typeof rawLink !== "string" || !rawLink.trim()) {
     throw new ApiError(400, "missing_link", "No short link given. Pass ?link=https://zbi.baby#...");
   }
@@ -86,9 +86,28 @@ export function expand (rawLink, publicUrl) {
     payload = payload.slice(host.length + 1);
   }
   if (isQr) payload = payload.slice(1);
-  try {
+
+  let alphabet;
+  if (mode) {
+    alphabet = ALPHABETS[mode.toLowerCase()];
+    if (!alphabet) {
+      throw new ApiError(400, "unknown_mode", `Unknown mode "${mode}". Use one of: ${Object.keys(ALPHABETS).join(", ")}.`);
+    }
+  } else if (isQr) {
+    alphabet = outputAlphabetQR;
+  } else if (Array.from(payload).every(c => outputAlphabetQR.includes(c))) {
+    // A bare payload built only from qr symbols cannot be told apart from a qr
+    // link, and decoding it as text can still produce something that looks like
+    // a link, so refuse rather than answer with the wrong one.
+    throw new ApiError(400, "ambiguous_payload",
+      "That payload only uses qr code symbols, so it cannot be told apart from a qr link. Pass the full short link, a payload with a leading /, or mode=qr.");
+  } else {
     const useEmoji = Array.from(payload).some(c => !outputAlphabetASCII.includes(c));
-    return decompress(payload, isQr ? outputAlphabetQR : useEmoji ? outputAlphabetEmoji : outputAlphabetASCII);
+    alphabet = useEmoji ? outputAlphabetEmoji : outputAlphabetASCII;
+  }
+
+  try {
+    return decompress(payload, alphabet);
   } catch (e) {
     throw new ApiError(400, "undecodable", "That payload is not something this service can unpack.");
   }
@@ -172,7 +191,11 @@ export function handleRequest ({ method, url, body, accept, publicUrl, maxUrlLen
     }
 
     if (url.pathname === "/api/v1/expand") {
-      const result = expand(url.searchParams.get("link") || url.searchParams.get("payload"), publicUrl);
+      const result = expand(
+        url.searchParams.get("link") || url.searchParams.get("payload"),
+        publicUrl,
+        url.searchParams.get("mode")
+      );
       if (wantsText(url, accept)) {
         return reply(`${result}\n`, "text/plain; charset=utf-8");
       }

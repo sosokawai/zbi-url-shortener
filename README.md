@@ -86,8 +86,11 @@ curl https://zbi.baby/api/v1/health
 
 `mode` picks the flavour: `hash` (default, payload in the fragment), `emoji`
 (payload in the fragment, as emoji) or `qr` (payload in the path, so it survives
-being printed as a QR code). Errors answer with a matching status and a code —
-`unsupported_protocol`, `url_too_long`, `undecodable` and friends. CORS is open.
+being printed as a QR code). It works on `expand` too, where a bare `qr` payload
+needs `mode=qr` or a leading `/` to be told apart from a text payload, and
+without one of those the api answers `400 ambiguous_payload` rather than guess.
+Errors answer with a matching status and a code — `unsupported_protocol`,
+`url_too_long`, `undecodable` and friends. CORS is open.
 
 ### From a Discord bot
 
@@ -116,7 +119,7 @@ npm test                                  # against the local compose stack
 BASE_URL=https://zbi.baby npm test        # against what is actually deployed
 ```
 
-16 checks covering all three modes, JSON and form posts, CORS, every error
+19 checks covering all three modes, JSON and form posts, CORS, every error
 code, and requests made with a Discord bot user agent, no user agent, and a
 `text/plain` accept header.
 
