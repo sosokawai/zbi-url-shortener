@@ -1,0 +1,21 @@
+name = "zbi-baby-api"
+main = "api/worker.js"
+compatibility_date = "2025-06-01"
+workers_dev = true
+
+# The docs page is imported as text, not parsed as a module.
+rules = [
+  { type = "Text", globs = ["**/*.html"], fallthrough = true }
+]
+
+[vars]
+PUBLIC_URL = "https://zbi.babby"
+MAX_URL_LENGTH = "2048"
+
+# Serves /api on the same domain as the Pages site, so the site can link to
+# "/api" and bots only ever need one hostname. Change the zone_name to the zone
+# that actually holds the domain.
+routes = [
+  { pattern = "zbi.babby/api", zone_name = "babby" },
+  { pattern = "zbi.babby/api/*", zone_name = "babby" }
+]

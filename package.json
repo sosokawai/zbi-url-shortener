@@ -1,0 +1,17 @@
+{
+  "name": "zbi-baby",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Stateless URL compressor hosted on zbi.babby, with a public JSON API for bots",
+  "scripts": {
+    "start": "node api/server.js",
+    "dev": "wrangler dev",
+    "deploy:api": "wrangler deploy",
+    "deploy:site": "wrangler pages deploy docs --project-name zbi-baby"
+  },
+  "devDependencies": {
+    "wrangler": "^4"
+  },
+  "license": "MIT"
+}

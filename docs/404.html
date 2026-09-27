@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ha.mr - link compressor</title>
+  <title>zbi.babby - link compressor</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Hammersmith+One&display=swap');
 
@@ -160,6 +160,20 @@
       text-align: center;
       padding: 0 8px;
     }
+    #local-log {
+      max-width: 70vmin;
+      margin: 16px auto 0;
+      text-align: left;
+      font-size: 0.75em;
+      color: gray;
+    }
+    #local-log div {
+      overflow-wrap: anywhere;
+    }
+    #local-log time {
+      color: light-dark(rgba(0, 0, 0, 0.4), rgba(255, 255, 255, 0.4));
+      margin-right: 6px;
+    }
   </style>
 </head>
 <body>
@@ -171,15 +185,15 @@
   </div>
 
   <header>
-    <a class="source-link" href="https://github.com/p2r3/ha.mr" target="_blank">Source code on GitHub</a>
+    <a class="source-link" href="/api">API</a>
     |
-    <a class="source-link" href="https://youtu.be/TOr1Vvji6jA" target="_blank">Explanation video</a>
+    <a class="source-link" href="https://github.com/sosokawai/zbi-url-shortener" target="_blank">Source code</a>
   </header>
 
   <div id="content">
 
-    <h1 class="title">ha.mr</h1>
-    <p class="subtitle">(read: "hammer")</p>
+    <h1 class="title">zbi.babby</h1>
+    <p class="subtitle">(short links, no database)</p>
 
     <input type="text" id="input-link" placeholder="https://some-long.link/" autofocus>
     <details id="query-warning">
@@ -215,6 +229,8 @@
       <input type="checkbox" id="settings-qr" name="settings-qr" autocomplete="off">
       <label for="settings-qr"> Output QR code</label><br>
     </span>
+
+    <div id="local-log"></div>
 
   </div>
 

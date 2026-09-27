@@ -1,5 +1,21 @@
+name: zbi-baby
+
 services:
   web:
     build: .
     ports:
       - "8080:80"
+    restart: unless-stopped
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL:-https://zbi.babby}
+      MAX_URL_LENGTH: ${MAX_URL_LENGTH:-2048}
+    expose:
+      - "3000"
+    restart: unless-stopped

@@ -7,14 +7,17 @@ import {
 
 let qrGenerate, qrMode, qrCorrection;
 
+const intendedDomains = ["zbi.babby", "www.zbi.babby"];
 let domain = window.location.hostname;
-if (domain !== "ha.mr" && domain !== "www.ha.mr") {
-  console.log(`This page is intended to be used on the ha.mr domain. You are currently on ${domain}.`);
+if (!intendedDomains.includes(domain)) {
+  console.log(`This page is intended to be used on the zbi.babby domain. You are currently on ${domain}.`);
 }
 const webPort = window.location.port;
 if (webPort && webPort !== "80" && webPort !== "443") {
   domain += `:${webPort}`;
 }
+
+const baseUrl = `${window.location.protocol}//${domain}`;
 
 var settings = {
   emoji: false,
@@ -114,9 +117,10 @@ function updateOutput () {
       outputRatioElement.textContent = "Output is the same length as the input";
       outputRatioElement.style.color = "gray";
     }
-    outputLinkElement.textContent = `http://${domain}#${output}`;
-    outputLinkElement.href = `http://${domain}#${output}`;
+    outputLinkElement.textContent = `${baseUrl}#${output}`;
+    outputLinkElement.href = `${baseUrl}#${output}`;
     outputLinkElement.style.color = "";
+    outputLinkElement.dataset.source = input;
     if (settings.qr) {
       // Lazyload the qr generator to avoid loading it on a redirect
       if (!qrGenerate) {
@@ -134,8 +138,7 @@ function updateOutput () {
       qrCodeImage.style.display = "inline";
       qrCodeCorrectionLevelContainer.style.display = "inline";
 
-      const qrCodeDomain = domain.toUpperCase();
-      const qrCodeLink = `HTTP://${qrCodeDomain}/${compress(input, outputAlphabetQR)}`;
+      const qrCodeLink = `${baseUrl.toUpperCase()}/${compress(input, outputAlphabetQR)}`;
 
       const errorCorrection = correctionLevels[qrCodeCorrectionLevelElement.value];
 
@@ -178,8 +181,50 @@ function updateOutput () {
     qrCodeCorrectionLevelContainer.style.display = "none";
     outputRatioElement.style.color = "rgba(255, 255, 255, 0)";
     outputLinkElement.removeAttribute("href");
+    delete outputLinkElement.dataset.source;
     queryWarningElement.style.display = "none";
   }
+}
+
+const localLogElement = document.querySelector("#local-log");
+const localLogKey = "zbi.babby.log";
+
+function renderLocalLog (entries) {
+  if (!localLogElement) return;
+  localLogElement.replaceChildren(...entries.map(entry => {
+    const line = document.createElement("div");
+    const time = document.createElement("time");
+    time.textContent = entry.at;
+    line.append(time, document.createTextNode(entry.url));
+    return line;
+  }));
+}
+
+function readLocalLog () {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(localLogKey) || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+if (localLogElement) {
+  renderLocalLog(readLocalLog());
+  outputLinkElement.addEventListener("click", () => {
+    const url = outputLinkElement.dataset.source;
+    if (!url) return;
+    const entries = readLocalLog();
+    const now = new Date();
+    const at = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+    entries.unshift({ at, url });
+    try {
+      localStorage.setItem(localLogKey, JSON.stringify(entries.slice(0, 12)));
+    } catch (e) {
+      return;
+    }
+    renderLocalLog(entries.slice(0, 12));
+  });
 }
 
 const redirectContainerElement = document.querySelector("#redirect-container");

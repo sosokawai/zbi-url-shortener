@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>zbi.babby api</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 17px;
+      line-height: 1.5;
+      max-width: 46em;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+    h1 {
+      font-size: 1.6em;
+      margin: 0 0 4px;
+    }
+    h2 {
+      font-size: 1.1em;
+      margin: 32px 0 8px;
+    }
+    .subtitle {
+      color: gray;
+      margin: 0 0 24px;
+    }
+    .back {
+      float: right;
+      font-size: 0.9em;
+    }
+    a {
+      color: rgb(50, 100, 255);
+    }
+    p, li {
+      overflow-wrap: anywhere;
+    }
+    code {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.9em;
+    }
+    pre {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.85em;
+      background: light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.08));
+      padding: 12px 14px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 6px 12px 6px 0;
+      border-bottom: 1px solid light-dark(rgba(0, 0, 0, 0.15), rgba(255, 255, 255, 0.2));
+    }
+    th {
+      font-size: 0.8em;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: gray;
+    }
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    input, select, button {
+      font: inherit;
+      padding: 7px 9px;
+      border: 1px solid light-dark(rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0.3));
+      border-radius: 6px;
+      background: transparent;
+      color: inherit;
+    }
+    input {
+      flex: 1 1 20em;
+      min-width: 0;
+    }
+    button {
+      cursor: pointer;
+    }
+    #output {
+      margin: 12px 0 0;
+      white-space: pre-wrap;
+    }
+    #output:empty {
+      display: none;
+    }
+    .note {
+      color: gray;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+
+  <a class="back" href="/">&larr; shortener</a>
+
+  <h1>zbi.babby api</h1>
+  <p class="subtitle">For bots, scripts and anything that speaks http.</p>
+
+  <p>
+    Nothing is stored. A short link <em>is</em> the original link, compressed
+    into the address itself, so <code>shorten</code> and <code>expand</code> are
+    pure functions of their input. No database, no accounts, no rate limit, no
+    expiry and nothing to leak.
+  </p>
+  <p>
+    Links come in two flavours: <code>#fragment</code> links, which are unpacked
+    in your browser, and <code>/path</code> links (<code>mode=qr</code>), which
+    the site reads from the path and which are therefore safe to print as a QR
+    code.
+  </p>
+
+  <h2>Try it</h2>
+  <form id="form">
+    <input type="text" id="url" value="https://www.amazon.com/dp/B0CX23V2ZK/ref=sr_1_1?keywords=widget" autocomplete="off">
+    <select id="mode">
+      <option value="hash">hash</option>
+      <option value="emoji">emoji</option>
+      <option value="qr">qr</option>
+    </select>
+    <button type="submit">Shorten</button>
+  </form>
+  <pre id="output"></pre>
+
+  <h2>Endpoints</h2>
+  <table>
+    <tr>
+      <th>Method</th>
+      <th>Path</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td><code>GET</code>, <code>POST</code></td>
+      <td><code>/api/v1/shorten</code></td>
+      <td>Compress a link. Parameters: <code>url</code> (required), <code>mode</code> = <code>hash</code>, <code>emoji</code> or <code>qr</code>.</td>
+    </tr>
+    <tr>
+      <td><code>GET</code></td>
+      <td><code>/api/v1/expand</code></td>
+      <td>Unpack a short link. Parameter: <code>link</code> (a full short link, or a bare payload).</td>
+    </tr>
+    <tr>
+      <td><code>GET</code></td>
+      <td><code>/api/v1/health</code></td>
+      <td>Liveness check.</td>
+    </tr>
+    <tr>
+      <td><code>GET</code></td>
+      <td><code>/api/v1</code></td>
+      <td>This list, as JSON.</td>
+    </tr>
+  </table>
+
+  <h2>Shorten</h2>
+  <pre># json in, json out, which is what curl gets
+curl -G "https://zbi.babby/api/v1/shorten" \
+  --data-urlencode "url=https://www.amazon.com/dp/B0CX23V2ZK/ref=sr_1_1?keywords=widget&amp;qid=1720000000"
+
+# the --data-urlencode is what keeps the ? and &amp; in the link from being read
+# as parameters of the api call itself
+
+# one line of text instead of json, for bots
+curl -G "https://zbi.babby/api/v1/shorten" --data-urlencode "url=https://example.com/x" -d "format=text"
+curl -H "Accept: text/plain" "https://zbi.babby/api/v1/shorten?url=https://example.com/x"
+
+# post it instead, as json
+curl -X POST https://zbi.babby/api/v1/shorten \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://example.com/some/long/path","mode":"hash"}'
+
+# or as a form, the way a html form would send it
+curl -X POST https://zbi.babby/api/v1/shorten -d "url=https://example.com/x"
+
+# qr links keep the payload in the path
+curl -G "https://zbi.babby/api/v1/shorten" --data-urlencode "url=https://example.com/x" -d "mode=qr" -d "format=text"</pre>
+
+  <p>Response, for the amazon link above:</p>
+  <pre>{
+  "input": "https://www.amazon.com/dp/B0CX23V2ZK/ref=sr_1_1?keywords=widget&amp;qid=1720000000",
+  "short": "https://zbi.babby#j,7*+lgC#nlHXCWK7#Bs!+ZxT*GtbviRyo_Zl@C*/?f@IA$0[wM&apos;Tj&amp;!",
+  "payload": "j,7*+lgC#nlHXCWK7#Bs!+ZxT*GtbviRyo_Zl@C*/?f@IA$0[wM&apos;Tj&amp;!",
+  "mode": "hash",
+  "input_length": 78,
+  "payload_length": 56,
+  "short_length": 74,
+  "shorter_percent": 5
+}</pre>
+
+  <h2>Expand</h2>
+  <pre># percent-encode the # so it is not read as a fragment of the api call
+curl "https://zbi.babby/api/v1/expand?link=https%3A%2F%2Fzbi.babby%23j%2C7*%2BlgC%23nlHXCWK7%23Bs!%2BZxT*GtbviRyo_Zl%40C*%2F%3Ff%40IA$0%5BwM%27Tj%26%21"
+
+# or let curl do it
+curl -G "https://zbi.babby/api/v1/expand" \
+  --data-urlencode "link=https://zbi.babby#j,7*+lgC#nlHXCWK7#Bs!+ZxT*GtbviRyo_Zl@C*/?f@IA$0[wM&apos;Tj&amp;!"
+
+# a bare payload works too
+curl -G "https://zbi.babby/api/v1/expand" --data-urlencode "payload=OQ/ap#"</pre>
+
+  <p>Response:</p>
+  <pre>{ "url": "https://www.amazon.com/dp/B0CX23V2ZK/ref=sr_1_1?keywords=widget&amp;qid=1720000000" }</pre>
+
+  <h2>Errors</h2>
+  <p>Anything that goes wrong answers with a matching status and a code:</p>
+  <pre>{
+  "error": {
+    "code": "unsupported_protocol",
+    "message": "Only http and https links can be compressed, got \"ftp:\"."
+  }
+}</pre>
+  <ul>
+    <li><code>400</code> <code>missing_url</code>, <code>invalid_url</code>, <code>unsupported_protocol</code>, <code>credentials_not_supported</code>, <code>unknown_mode</code>, <code>missing_link</code>, <code>undecodable</code>, <code>invalid_json</code></li>
+    <li><code>404</code> <code>not_found</code></li>
+    <li><code>405</code> <code>method_not_allowed</code></li>
+    <li><code>413</code> <code>body_too_long</code></li>
+    <li><code>414</code> <code>url_too_long</code></li>
+    <li><code>415</code> <code>unsupported_media_type</code></li>
+  </ul>
+
+  <h2>Rules</h2>
+  <ul>
+    <li>only <code>http</code> and <code>https</code> links, and no credentials in the URL</li>
+    <li>links are capped at 2048 characters, see <code>MAX_URL_LENGTH</code></li>
+    <li>CORS is open, so a script on any page may call it</li>
+    <li><code>format=text</code> or <code>Accept: text/plain</code> returns bare text instead of JSON</li>
+    <li>nothing is written down, and no link is ever logged</li>
+  </ul>
+
+  <h2>Links</h2>
+  <p class="note">
+    <a href="https://github.com/sosokawai/zbi-url-shortener">Source code</a> &middot;
+    <a href="/">zbi.babby</a> &middot; fork of <a href="https://github.com/p2r3/ha.mr">ha.mr</a>
+  </p>
+
+  <script type="module">
+    const form = document.querySelector("#form");
+    const urlInput = document.querySelector("#url");
+    const modeSelect = document.querySelector("#mode");
+    const output = document.querySelector("#output");
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      const params = new URLSearchParams({ url: urlInput.value, mode: modeSelect.value });
+      output.textContent = "...";
+      try {
+        const response = await fetch(`/api/v1/shorten?${params}`);
+        const body = await response.json();
+        output.textContent = body.short
+          ? `${body.short}\n\n${JSON.stringify(body, null, 2)}`
+          : JSON.stringify(body, null, 2);
+      } catch (e) {
+        output.textContent = String(e);
+      }
+    });
+  </script>
+</body>
+</html>

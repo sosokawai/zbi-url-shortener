@@ -15,12 +15,12 @@ if (!input) {
 }
 
 let payload = "";
-if (input.toLowerCase().startsWith("http://ha.mr")) {
-  payload = input.slice(12);
-} else if (input.toLowerCase().startsWith("https://ha.mr")) {
-  payload = input.slice(13);
-} else if (input.toLowerCase().startsWith("ha.mr")) {
-  payload = input.slice(5);
+if (input.toLowerCase().startsWith("http://zbi.babby")) {
+  payload = input.slice(16);
+} else if (input.toLowerCase().startsWith("https://zbi.babby")) {
+  payload = input.slice(17);
+} else if (input.toLowerCase().startsWith("zbi.babby")) {
+  payload = input.slice(9);
 } else if (command === "decode") {
   const pos = input.indexOf("#");
   payload = input.slice(pos);
@@ -46,7 +46,7 @@ else if (alphabetName !== "ascii") {
 }
 
 if (alphabetName === "qr") {
-  console.log("HTTP://HA.MR/" + compress(input, alphabet));
+  console.log("HTTPS://ZBI.BABBY/" + compress(input, alphabet));
 } else {
-  console.log("http://ha.mr#" + compress(input, alphabet));
+  console.log("https://zbi.babby#" + compress(input, alphabet));
 }
