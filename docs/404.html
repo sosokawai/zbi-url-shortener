@@ -185,6 +185,11 @@
     aside iframe {
       border: 0;
       max-width: 100%;
+      /* Chrome paints a white canvas inside a cross origin iframe, which shows
+         through the rounded corners the widget draws. Clipping the iframe to
+         the widget's own radius (.75em) cuts those corners away. */
+      border-radius: 0.75em;
+      background: transparent;
     }
   </style>
 </head>
@@ -252,7 +257,7 @@
           height="192"
           frameborder="0"
           sandbox="allow-scripts"
-          src="https://widgets.vendicated.dev/user?id=892246841016590386&theme=dark&banner=true&full-banner=true&rounded-corners=true&discord-icon=true&badges=false&guess-nitro=true&"
+          src="https://widgets.vendicated.dev/user?id=892246841016590386&theme=dark&banner=true&full-banner=true&rounded-corners=true&discord-icon=true&badges=false&guess-nitro=true&transparent=true&"
         ></iframe>
       </figure>
     </aside>
