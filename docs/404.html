@@ -75,7 +75,10 @@
       text-align: center;
     }
     a {
-      color: rgb(50, 100, 255);
+      color: light-dark(rgba(0, 0, 0, 0.85), #ffffff);
+    }
+    a:hover {
+      text-decoration: underline;
     }
     button {
       padding: 5px 10px;
@@ -92,6 +95,11 @@
     .logo {
       display: block;
       margin: 0 auto 14px;
+    }
+    @media (prefers-color-scheme: light) {
+      .logo {
+        filter: invert(1);
+      }
     }
     .subtitle {
       font-size: 0.6em;
@@ -213,7 +221,7 @@
 
   <div id="content">
 
-    <img class="logo" src="/logo.png" width="88" height="130" alt="">
+    <img class="logo" src="/logo.png" width="104" height="104" alt="">
 
     <h1 class="title">zbi.baby</h1>
     <p class="subtitle">(short links, no database)</p>
