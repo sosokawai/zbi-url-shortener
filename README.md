@@ -22,11 +22,21 @@ npm run deploy:site  # docs/ -> Cloudflare Pages
 npm run deploy:api   # api/worker.js -> Cloudflare Workers
 ```
 
-- **Pages** serves `docs/`. Attach `zbi.baby` as a custom domain in the project
-  settings. `docs/CNAME` holds the same name for the git-based flow.
+- **Pages** serves `docs/`. Create the Pages project with no framework preset,
+  no build command, and `docs` as the output directory, then attach `zbi.baby`
+  as a custom domain in the project settings. `docs/CNAME` holds the same name
+  for the git-based flow. A Workers build will not do this for you, it only
+  publishes the Worker; the site needs its own Pages project.
 - **Workers** serves `/api` on the same hostname, so the site can link to `/api`
   and a bot only needs one domain. The route, the zone and the variables
-  (`PUBLIC_URL`, `MAX_URL_LENGTH`) are all in `wrangler.toml`.
+  (`PUBLIC_URL`, `MAX_URL_LENGTH`) are all in `wrangler.toml`. Two things to get
+  right there: the Worker `name` has to match the name the connected build
+  expects, or wrangler overrides it and tries to open a pull request; and
+  `routes` has to sit **above** the `[vars]` header, because a key after it
+  belongs to the vars table and gets uploaded as an env var called `routes`
+  instead of registering the route. Check it took effect by looking for
+  `env.routes` in the bindings list of the build log — if that line is there,
+  the route was not applied.
 - `npm run dev` runs the Worker on :8787, which is the quickest way to check a
   change before deploying it.
 

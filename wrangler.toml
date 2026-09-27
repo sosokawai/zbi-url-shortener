@@ -1,4 +1,4 @@
-name = "zbi-baby-api"
+name = "zbi-url-shortener"
 main = "api/worker.js"
 compatibility_date = "2025-06-01"
 workers_dev = true
@@ -8,14 +8,15 @@ rules = [
   { type = "Text", globs = ["**/*.html"], fallthrough = true }
 ]
 
-[vars]
-PUBLIC_URL = "https://zbi.baby"
-MAX_URL_LENGTH = "2048"
-
 # Serves /api on the same domain as the Pages site, so the site can link to
-# "/api" and bots only ever need one hostname. Change the zone_name to the zone
-# that actually holds the domain.
+# "/api" and bots only ever need one hostname. This has to stay above [vars]:
+# a key placed after that header belongs to the vars table, and wrangler will
+# upload it as an env var named "routes" instead of registering the route.
 routes = [
   { pattern = "zbi.baby/api", zone_name = "baby" },
   { pattern = "zbi.baby/api/*", zone_name = "baby" }
 ]
+
+[vars]
+PUBLIC_URL = "https://zbi.baby"
+MAX_URL_LENGTH = "2048"
