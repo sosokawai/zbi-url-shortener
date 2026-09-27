@@ -214,6 +214,53 @@ curl -G "https://zbi.babby/api/v1/expand" --data-urlencode "payload=OQ/ap#"</pre
   <p>Response:</p>
   <pre>{ "url": "https://www.amazon.com/dp/B0CX23V2ZK/ref=sr_1_1?keywords=widget&amp;qid=1720000000" }</pre>
 
+  <h2>Using it from a bot</h2>
+  <p>
+    One GET is all it takes, and there is no key to register. Two things are worth
+    knowing if the caller is a chat bot:
+  </p>
+  <ul>
+    <li>
+      A <code>#fragment</code> link is only decodable in a browser, because a
+      fragment never reaches a server. Anything that fetches a link itself — a
+      link preview crawler, a validator, a client that trims the tail off — sees
+      plain <code>zbi.babby</code> and nothing more. When you need a link that
+      stands on its own, ask for <code>mode=qr</code>: the payload rides in the
+      path, so the link is decodable by anything.
+    </li>
+    <li>
+      <code>Accept: text/plain</code> or <code>format=text</code> answers with
+      the link and nothing else, which drops straight into a message.
+    </li>
+  </ul>
+  <pre># discord.py
+import requests
+from discord.ext import commands
+
+@commands.command()
+async def shorten(ctx, url: str):
+    response = requests.get(
+        "https://zbi.babby/api/v1/shorten",
+        params={"url": url, "mode": "qr"},
+        headers={"Accept": "text/plain"},
+        timeout=5,
+    )
+    response.raise_for_status()
+    await ctx.send(response.text.strip())</pre>
+  <pre>// discord.js
+const query = new URLSearchParams({ url, mode: "qr", format: "text" });
+const response = await fetch(`https://zbi.babby/api/v1/shorten?${query}`);
+if (response.ok) {
+  await interaction.reply((await response.text()).trim());
+}</pre>
+  <p class="note">
+    On Cloudflare, two settings will bite you: keep Bot Fight Mode off for
+    <code>/api</code>, because it challenges requests that look like bots and a
+    bot asking for a short link is exactly that; and check that the Worker route
+    really does win over Pages for <code>/api</code>, or requests will land on
+    the static site and come back as HTML instead of JSON.
+  </p>
+
   <h2>Errors</h2>
   <p>Anything that goes wrong answers with a matching status and a code:</p>
   <pre>{

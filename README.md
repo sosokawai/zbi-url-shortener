@@ -89,6 +89,37 @@ curl https://zbi.babby/api/v1/health
 being printed as a QR code). Errors answer with a matching status and a code —
 `unsupported_protocol`, `url_too_long`, `undecodable` and friends. CORS is open.
 
+### From a Discord bot
+
+One GET, no key, nothing to sign up for:
+
+```py
+# discord.py
+response = requests.get(
+    "https://zbi.babby/api/v1/shorten",
+    params={"url": url, "mode": "qr"},
+    headers={"Accept": "text/plain"},
+    timeout=5,
+)
+response.raise_for_status()
+await ctx.send(response.text.strip())
+```
+
+Ask for `mode=qr` in a chat bot. A `#fragment` link never reaches a server, so
+Discord's preview crawler (and anything else that fetches the link) only sees
+`zbi.babby`; a path link is decodable by anything.
+
+### Testing it
+
+```sh
+npm test                                  # against the local compose stack
+BASE_URL=https://zbi.babby npm test        # against what is actually deployed
+```
+
+16 checks covering all three modes, JSON and form posts, CORS, every error
+code, and requests made with a Discord bot user agent, no user agent, and a
+`text/plain` accept header.
+
 ## CLI
 
 ```sh
@@ -118,6 +149,7 @@ Everything upstream does still works, unmodified. The fork adds:
 - `api/worker.js` — Cloudflare Worker entry point
 - `api/server.js` — node entry point, same behaviour, for local use
 - `api/docs.html` — the api documentation page
+- `test/api.test.mjs` — the api test suite, no dependencies
 - `wrangler.toml` — Worker name, routes and variables
 
 To move to a different domain, replace `zbi.babby` in `docs/main.js`,
