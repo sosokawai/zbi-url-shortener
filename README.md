@@ -31,12 +31,20 @@ npm run deploy:api   # api/worker.js -> Cloudflare Workers
   and a bot only needs one domain. The route, the zone and the variables
   (`PUBLIC_URL`, `MAX_URL_LENGTH`) are all in `wrangler.toml`. Two things to get
   right there: the Worker `name` has to match the name the connected build
-  expects, or wrangler overrides it and tries to open a pull request; and
+  expects, or wrangler overrides it and tries to open a pull request;
   `routes` has to sit **above** the `[vars]` header, because a key after it
   belongs to the vars table and gets uploaded as an env var called `routes`
-  instead of registering the route. Check it took effect by looking for
-  `env.routes` in the bindings list of the build log — if that line is there,
-  the route was not applied.
+  instead of registering the route; and `zone_name` is the zone in your
+  account, which is `zbi.baby` and not `baby`, since the `.baby` apex belongs
+  to the registry. A wrong zone fails the build with
+  `The zone "..." does not exist on your account [code: 10083]` after the
+  Worker has already uploaded, so the api is live while the route is not.
+  Check the build log for `env.routes` (means the route was not applied) and
+  for that 10083 error (means the route was rejected).
+
+  The Worker must **not** also hold `zbi.baby` as a custom domain. A Worker
+  custom domain covers every path on the hostname and shadows the Pages
+  project, which shows up as the api's JSON `not_found` on `/`.
 - `npm run dev` runs the Worker on :8787, which is the quickest way to check a
   change before deploying it.
 

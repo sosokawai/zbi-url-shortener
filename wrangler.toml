@@ -12,9 +12,12 @@ rules = [
 # "/api" and bots only ever need one hostname. This has to stay above [vars]:
 # a key placed after that header belongs to the vars table, and wrangler will
 # upload it as an env var named "routes" instead of registering the route.
+#
+# zone_name is the zone in the account, which is zbi.baby itself, not baby:
+# the .baby apex belongs to the registry and a route cannot be attached there.
 routes = [
-  { pattern = "zbi.baby/api", zone_name = "baby" },
-  { pattern = "zbi.baby/api/*", zone_name = "baby" }
+  { pattern = "zbi.baby/api", zone_name = "zbi.baby" },
+  { pattern = "zbi.baby/api/*", zone_name = "zbi.baby" }
 ]
 
 [vars]
