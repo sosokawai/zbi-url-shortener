@@ -52,6 +52,7 @@ const inputLinkElement = document.querySelector("#input-link");
 const outputLinkElement = document.querySelector("#output-link");
 const outputRatioElement = document.querySelector("#output-ratio");
 const queryWarningElement = document.querySelector("#query-warning");
+const copyButtonElement = document.querySelector("#copy-link");
 
 const qrCodeImage = document.querySelector("#qrcode");
 const qrCodeCorrectionLevelContainer = document.querySelector("#qr-correct-level-container");
@@ -59,6 +60,47 @@ const qrCodeCorrectionLevelElement = document.querySelector("#qr-correct-level")
 
 qrCodeCorrectionLevelElement.addEventListener("input", () => {
   updateOutput();
+});
+
+const copyLabel = copyButtonElement.textContent;
+let copyResetTimer = null;
+
+copyButtonElement.addEventListener("click", async () => {
+  const text = outputLinkElement.textContent;
+  let copied = false;
+  try {
+    await navigator.clipboard.writeText(text);
+    copied = true;
+  } catch (e) {
+    // No clipboard permission, or no secure context. Selecting the text still
+    // gets it on the clipboard where the browser allows that, and if even that
+    // is refused then leaving it selected is the only thing left to offer.
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.select();
+    try {
+      copied = document.execCommand("copy");
+    } catch (e2) {
+      copied = false;
+    }
+    area.remove();
+    if (!copied) {
+      const range = document.createRange();
+      range.selectNodeContents(outputLinkElement);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  }
+  copyButtonElement.textContent = copied ? "copied" : "ctrl+c to copy";
+  clearTimeout(copyResetTimer);
+  copyResetTimer = setTimeout(() => {
+    copyButtonElement.textContent = copyLabel;
+  }, 1500);
 });
 
 function updateOutput () {
@@ -121,6 +163,9 @@ function updateOutput () {
     outputLinkElement.href = `${baseUrl}#${output}`;
     outputLinkElement.style.color = "";
     outputLinkElement.dataset.source = input;
+    copyButtonElement.hidden = false;
+    copyButtonElement.textContent = copyLabel;
+    clearTimeout(copyResetTimer);
     if (settings.qr) {
       // Lazyload the qr generator to avoid loading it on a redirect
       if (!qrGenerate) {
@@ -182,6 +227,8 @@ function updateOutput () {
     outputRatioElement.style.color = "rgba(255, 255, 255, 0)";
     outputLinkElement.removeAttribute("href");
     delete outputLinkElement.dataset.source;
+    copyButtonElement.hidden = true;
+    clearTimeout(copyResetTimer);
     queryWarningElement.style.display = "none";
   }
 }

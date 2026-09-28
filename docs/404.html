@@ -89,6 +89,14 @@
           rgba(255, 255, 255, 0.1));
       cursor: pointer;
     }
+    #copy-link {
+      margin-top: 8px;
+      font-size: 0.8em;
+      color: inherit;
+    }
+    #copy-link[hidden] {
+      display: none;
+    }
     .title {
       font-size: 2.5em;
     }
@@ -240,8 +248,9 @@
       removed, making the link much shorter.
     </details>
     <p id="output-link-container">
-      <a id="output-link" target="_blank">Enter a link above to compress</a>
+      <a id="output-link" target="_blank" rel="noopener">enter a link above to compress</a>
       <br><span id="output-ratio">&nbsp;</span>
+      <br><button id="copy-link" type="button" hidden>copy link</button>
     </p>
 
     <canvas id="qrcode"></canvas>
