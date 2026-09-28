@@ -12,45 +12,39 @@ the hard work. See [what changed here](#what-changed-here) and
 
 ## Deploying
 
-The site is a static bundle, the api is a Cloudflare Worker.
+Both the site and the api are one Cloudflare Worker, deployed from this repo.
 
 ```sh
 npm install          # wrangler, for the deploy commands
 npx wrangler login
 
-npm run deploy:site  # docs/ -> Cloudflare Pages
-npm run deploy:api   # api/worker.js -> Cloudflare Workers
+npm run deploy       # the site and the api, together
 ```
 
-- **Pages** serves `docs/`. Create the Pages project with no framework preset,
-  no build command, and `docs` as the output directory, then attach `zbi.baby`
-  as a custom domain in the project settings. `docs/CNAME` holds the same name
-  for the git-based flow. A Workers build will not do this for you, it only
-  publishes the Worker; the site needs its own Pages project.
-- **Workers** serves `/api` on the same hostname, so the site can link to `/api`
-  and a bot only needs one domain. The route, the zone and the variables
-  (`PUBLIC_URL`, `MAX_URL_LENGTH`) are all in `wrangler.toml`. Two things to get
-  right there: the Worker `name` has to match the name the connected build
-  expects, or wrangler overrides it and tries to open a pull request;
-  `routes` has to sit **above** the `[vars]` header, because a key after it
-  belongs to the vars table and gets uploaded as an env var called `routes`
-  instead of registering the route; and `zone_name` is the zone in your
-  account, which is `zbi.baby` and not `baby`, since the `.baby` apex belongs
-  to the registry. A wrong zone fails the build with
-  `The zone "..." does not exist on your account [code: 10083]` after the
-  Worker has already uploaded, so the api is live while the route is not.
-  Check the build log for `env.routes` (means the route was not applied) and
-  for that 10083 error (means the route was rejected).
+The Worker owns the whole of `zbi.baby` through its custom domain, and
+`[assets]` in `wrangler.toml` serves `docs/` from it, so there is one deployment
+and one owner for the hostname. A request that matches a file is answered by
+Cloudflare's asset server without the Worker even running; anything else falls
+through to `api/worker.js`, which serves the app shell for site paths and the
+api for `/api`.
 
-  The Worker must **not** also hold `zbi.baby` as a custom domain. A Worker
-  custom domain covers every path on the hostname and shadows the Pages
-  project, which shows up as the api's JSON `not_found` on `/`.
-- `npm run dev` runs the Worker on :8787, which is the quickest way to check a
-  change before deploying it.
+Three things in `wrangler.toml` are load bearing:
 
-If Pages takes `/api` back on your zone, give the Worker its own subdomain:
-change `pattern` to `api.zbi.baby/*`, attach that as a custom domain, and point
-the `API` link in `docs/404.html` at it.
+- `html_handling = "none"`. The default rewrites `404.html` to `/404`, which
+  costs a redirect and, worse, replaces the path that a qr link is read from.
+- `[assets]` has to exist. Without it the Worker answers every path with the
+  api's JSON `not_found`, which is exactly what a hostname with only a Worker on
+  it looks like.
+- the Worker `name` has to match the name the connected build expects, or
+  wrangler overrides it and offers to open a pull request instead.
+
+`npm run dev` runs it on :8787, which is the quickest way to check a change
+before deploying it. `npm test` against :8787 exercises the api and the site
+together in the real Workers runtime.
+
+A separate Pages project is not needed. If you have one it does not matter: a
+Worker custom domain covers every path on the hostname, so the Worker wins and
+the Pages project sits unused.
 
 ## Running it locally
 
@@ -171,7 +165,7 @@ Everything upstream does still works, unmodified. The fork adds:
 - `api/server.js` — node entry point, same behaviour, for local use
 - `api/docs.html` — the api documentation page
 - `test/api.test.mjs` — the api test suite, no dependencies
-- `wrangler.toml` — Worker name, routes and variables
+- `wrangler.toml` — Worker name, static assets and variables
 
 To move to a different domain, replace `zbi.baby` in `docs/main.js`,
 `docs/404.html`, `docs/CNAME`, `standalone.js`, `nginx.conf` and `wrangler.toml`.

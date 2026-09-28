@@ -8,17 +8,16 @@ rules = [
   { type = "Text", globs = ["**/*.html"], fallthrough = true }
 ]
 
-# Serves /api on the same domain as the Pages site, so the site can link to
-# "/api" and bots only ever need one hostname. This has to stay above [vars]:
-# a key placed after that header belongs to the vars table, and wrangler will
-# upload it as an env var named "routes" instead of registering the route.
-#
-# zone_name is the zone in the account, which is zbi.baby itself, not baby:
-# the .baby apex belongs to the registry and a route cannot be attached there.
-routes = [
-  { pattern = "zbi.baby/api", zone_name = "zbi.baby" },
-  { pattern = "zbi.baby/api/*", zone_name = "zbi.baby" }
-]
+# The site is served by the worker as well as the api, so the whole of zbi.baby
+# is one deployment and the hostname has a single owner. Nothing is shadowing
+# anything else, and there is no zone name to get wrong.
+[assets]
+directory = "./docs"
+binding = "ASSETS"
+# The app is one document served on every path, and a qr link is read out of the
+# path, so the path must survive untouched. The default auto-trailing-slash
+# would rewrite 404.html to /404, which both redirects and loses the payload.
+html_handling = "none"
 
 [vars]
 PUBLIC_URL = "https://zbi.baby"
